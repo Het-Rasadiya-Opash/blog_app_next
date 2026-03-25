@@ -1,22 +1,19 @@
 "use client";
-import { assets, blog_data } from "@/Assets/assets";
+import { assets } from "@/Assets/assets";
 import Footer from "@/components/Footer";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const page = ({ params }) => {
-  const { id } = React.use(params);
   const [data, setData] = useState(null);
 
   const fetchBlogData = async () => {
-    for (let i = 0; i < blog_data.length; i++) {
-      if (blog_data[i].id === Number(id)) {
-        console.log(blog_data[i]);
-        setData(blog_data[i]);
-        break;
-      }
-    }
+    const response = await axios.get(`/api/blog`, {
+      params: { id: params.id },
+    });
+    setData(response.data);
   };
 
   useEffect(() => {

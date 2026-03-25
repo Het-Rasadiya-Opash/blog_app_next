@@ -8,12 +8,22 @@ const loadDB = async () => {
 };
 loadDB();
 
+// API Endpoint to get all blogs
 export async function GET(request) {
-  return NextResponse.json({
-    msg: "Api Working",
-  });
+  const blogId = request.nextUrl.searchParams.get("id");
+
+  if (blogId) {
+    const blog = await BlogModel.findById(blogId);
+    return NextResponse.json(blog);
+  } else {
+    const blogs = await BlogModel.find({});
+    return NextResponse.json({
+      blogs,
+    });
+  }
 }
 
+// API Endpoint for Uploading blog
 export async function POST(request) {
   const formData = await request.formData();
   const timestamp = Date.now();
@@ -26,11 +36,16 @@ export async function POST(request) {
   const imgUrl = `/${timestamp}_${image.name}`;
 
   const authorImg = formData.get("authorImg");
-  const authorImgByteData = await authorImg.arrayBuffer();
-  const authorBuffer = Buffer.from(authorImgByteData);
-  const authorPath = `./public/${timestamp}_${authorImg.name}`;
-  await writeFile(authorPath, authorBuffer);
-  const authorImgUrl = `/${timestamp}_${authorImg.name}`;
+  let authorImgUrl;
+  if (authorImg instanceof File) {
+    const authorImgByteData = await authorImg.arrayBuffer();
+    const authorBuffer = Buffer.from(authorImgByteData);
+    const authorPath = `./public/${timestamp}_${authorImg.name}`;
+    await writeFile(authorPath, authorBuffer);
+    authorImgUrl = `/${timestamp}_${authorImg.name}`;
+  } else {
+    authorImgUrl = authorImg;
+  }
 
   const blogData = {
     title: formData.get("title"),
