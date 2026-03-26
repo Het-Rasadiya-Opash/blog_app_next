@@ -30,12 +30,12 @@ export const Header = () => {
 
       <div className="flex items-center justify-between">
  <Image src={assets.logo} width={180} height={40} alt="Logo"
-          className="cursor-pointer w-[180px] h-auto"/>
+          className="cursor-pointer w-45 h-auto"/>
 
         <button className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
           Get Started
   <Image src={assets.arrow} width={18} height={18} alt="arrow icon"
-            className="w-[18px] h-auto"/>
+            className="w-4.5 h-auto"/>
         </button>
 
       </div>
