@@ -7,11 +7,12 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const page = ({ params }) => {
+  const { id } = React.use(params);
   const [data, setData] = useState(null);
 
   const fetchBlogData = async () => {
     const response = await axios.get(`/api/blog`, {
-      params: { id: params.id },
+      params: { id },
     });
     setData(response.data);
   };
@@ -44,7 +45,7 @@ const page = ({ params }) => {
               </h1>
               <Image
                 className="mx-auto mt-6 border border-white rounded-full"
-                src={data.author_img}
+                src={data.authorImg}
                 alt=""
                 width={60}
                 height={60}

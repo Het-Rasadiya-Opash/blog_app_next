@@ -24,41 +24,43 @@ export async function GET(request) {
 }
 
 // API Endpoint for Uploading blog
-export async function POST(request) {
-  const formData = await request.formData();
-  const timestamp = Date.now();
+export async function POST(request){
+    const formData = await request.formData();
+    const timestamp = Date.now();
+    
+    const image = formData.get('image');
+    if (!image) {
+        return NextResponse.json({success: false, msg:"Image is required"}, {status: 400});
+    }
 
-  const image = formData.get("image");
-  const imageByteData = await image.arrayBuffer();
-  const buffer = Buffer.from(imageByteData);
-  const path = `./public/${timestamp}_${image.name}`;
-  await writeFile(path, buffer);
-  const imgUrl = `/${timestamp}_${image.name}`;
+    const imageByteData = await image.arrayBuffer();
+    const buffer = Buffer.from(imageByteData);
+    const path = `./public/${timestamp}_${image.name}`;
+    
+    await writeFile(path, buffer);
+    const imgUrl = `/${timestamp}_${image.name}`;
 
-  const authorImg = formData.get("authorImg");
-  let authorImgUrl;
-  if (authorImg instanceof File) {
-    const authorImgByteData = await authorImg.arrayBuffer();
-    const authorBuffer = Buffer.from(authorImgByteData);
-    const authorPath = `./public/${timestamp}_${authorImg.name}`;
-    await writeFile(authorPath, authorBuffer);
-    authorImgUrl = `/${timestamp}_${authorImg.name}`;
-  } else {
-    authorImgUrl = authorImg;
-  }
+    const blogData = {
+        title: `${formData.get('title')}`,
+        description: `${formData.get('description')}`,
+        category: `${formData.get('category')}`,
+        author: `${formData.get('author')}`,
+        image: `${imgUrl}`,
+        authorImg: `${formData.get('authorImg')}`
+    }
 
-  const blogData = {
-    title: formData.get("title"),
-    description: formData.get("description"),
-    category: formData.get("category"),
-    author: formData.get("author"),
-    image: imgUrl,
-    authorImg: authorImgUrl,
-  };
-  const blog = await BlogModel.create(blogData);
+    await BlogModel.create(blogData);
+    console.log("Blog Saved");
+    
+    return NextResponse.json({success:true, msg:"Blog Added"})
+}
 
-  return NextResponse.json({
-    success: true,
-    msg: "Blog Saved",
-  });
+
+export async function DELETE(request) {
+    const id = request.nextUrl.searchParams.get("id");
+    if (id) {
+        await BlogModel.findByIdAndDelete(id);
+        return NextResponse.json({success: true, msg: "Blog Deleted"});
+    }
+    return NextResponse.json({success: false, msg: "ID is required"}, {status: 400});
 }

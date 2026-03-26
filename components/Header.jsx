@@ -1,39 +1,67 @@
-import { assets } from "@/Assets/assets";
+'use client'
 import Image from "next/image";
+import { assets } from "@/Assets/assets";
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-const Header = () => {
+export const Header = () => {
+
+  const [email,setemail] =useState("");
+  const onSubmitHandler=async(e)=>{
+    e.preventDefault();
+    try {
+      const formData=new FormData();
+      formData.append("email",email);
+      const response = await axios.post('/api/email',formData);
+      if(response.data.success){
+        toast.success(response.data.msg);
+        setemail("");
+      }else{
+        toast.error("Error");
+      }
+    } catch (error) {
+      toast.error("Subscription failed");
+    }
+  }
+
   return (
-    <div className="py-5 px-5 md:px-12 lg:px-28">
-      <div className="flex justify-between items-center">
-        <Image
-          src={assets.logo}
-          width={180}
-          alt=""
-          className="w-32.5 sm:w-auto"
-        />
-        <button className="flex items-center gap-2 font-medium py-1 px-3 sm:py-3 sm:px-6 border border-solid border-black shadow-[-7px_7px_0px_#000000] ">
-          Get Started <Image src={assets.arrow} alt="" />
+    <div className="w-full px-6 md:px-16 lg:px-24 py-6">
+
+      <div className="flex items-center justify-between">
+ <Image src={assets.logo} width={180} height={40} alt="Logo"
+          className="cursor-pointer w-[180px] h-auto"/>
+
+        <button className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
+          Get Started
+  <Image src={assets.arrow} width={18} height={18} alt="arrow icon"
+            className="w-[18px] h-auto"/>
         </button>
+
       </div>
-      <div className="text-center my-8 ">
-        <h1 className="text-3xl sm:text-5xl font-medium ">Latest Blogs</h1>
-        <p className="mt-10 max-w-[740] m-auto text-xs sm:text-base">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur,
-          officia.
+      <div className="text-center mt-16 max-w-2xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-4">
+          Latest Blogs
+        </h1>
+
+        <p className="text-gray-600 mb-8">
+          Lorem Ipsum is simply dummy text of the printing and typesetting
+          industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever.
         </p>
-        <form className="flex justify-between max-w-125 scale-75 sm:scale-100 mx-auto mt-10 border border-black shadow-[-7px_7px_0px_#000000]">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="pl-4 outline-none"
-          />
-          <button type="submit" className="border-l border-black py-4 px-4 sm:px-8 active:bg-gray-600 active:text-white">
+        <form onSubmit={onSubmitHandler} className="flex items-center justify-center gap-3">
+
+          <input onChange={(e)=>setemail(e.target.value)} value={email} 
+          type="email" placeholder="Enter your email"
+            className="px-4 py-2 w-64 border border-gray-300 rounded-full outline-none focus:ring-2 focus:ring-black"/>
+
+          <button type="submit" className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
             Subscribe
           </button>
+
         </form>
+
       </div>
     </div>
   );
 };
-
-export default Header;
